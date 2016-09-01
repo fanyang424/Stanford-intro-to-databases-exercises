@@ -1,6 +1,41 @@
 
 
---Q1.Find the names of all reviewers who rated Gone with the Wind
+--Q1.
+--Find the names of all reviewers who rated Gone with the Wind
 select distinct name 
 from Movie natural join Rating natural join Reviewer
 where title ='Gone with the Wind';
+
+--Q2
+--For any rating where the reviewer is the same as the director of the movie, return the reviewer name, movie title, and number of stars. 
+select name, title, stars
+from Movie natural join Rating natural join Reviewer
+where name=director;
+
+--Q3
+--Return all reviewer names and movie names together in a single list, alphabetized. (Sorting by the first name of the reviewer and first word in the title is fine; no need for special processing on last names or removing "The".) 
+select distinct name from Reviewer
+union
+select distinct title from Movie 
+order by name, title;
+
+--Q4
+--Find the titles of all movies not reviewed by Chris Jackson. 
+select title from Movie
+where title not in
+(select distinct title
+from Movie left join Rating on Movie.mID=Rating.mID natural join Reviewer
+where name ='Chris Jackson')
+
+--Q5
+--For all pairs of reviewers such that both reviewers gave a rating to the same movie, return the names of both reviewers. Eliminate duplicates, don't pair reviewers with themselves, and include each pair only once. For each pair, return the names in the pair in alphabetical order. 
+select distinct name1, name2
+from ( select R1.rID, Re1.name as name1, R2.rID, Re2.name as name2, R1.mID
+from Rating R1, Rating R2, Reviewer Re1, Reviewer Re2
+where R1.mID = R2.mID
+and R1.rID = Re1.rID
+and R2.rID = Re2.rID
+and Re1.name <> Re2.name
+order by Re1.name ) as Pair
+where name1 < name2;
+
